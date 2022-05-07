@@ -58,7 +58,7 @@ func _ready():
 		
 	
 	
-	print_wavefunction()
+#	print_wavefunction()
 	
 	generate_map()
 	

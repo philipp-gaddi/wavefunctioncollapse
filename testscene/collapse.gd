@@ -29,11 +29,7 @@ func collapse():
 		vertex = stack.pop_back()
 		vertex.visited = true
 		
-		# create the possible superposition for the neighbouring 
-		# vertices, which is the intersection its own superposition
-		# right hand side.
 		neighbour_superposition_update = get_superposition_update(vertex.data[SUPERPOSITION])
-		
 		for v in wave_function.neighbours(vertex):
 			
 			if not v.visited:
