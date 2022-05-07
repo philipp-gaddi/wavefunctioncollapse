@@ -1,0 +1,3 @@
+[submodule "addons/godot_utility"]
+	path = addons/godot_utility
+	url = git@github.com:philipp-gaddi/godot_utility.git
