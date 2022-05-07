@@ -1,0 +1,174 @@
+[gd_scene load_steps=5 format=2]
+
+[sub_resource type="GDScript" id=4]
+script/source = "extends Spatial
+
+
+const ruleset = {
+	\"blue\" : [\"blue\", \"yellow\"],
+	\"yellow\": [\"blue\", \"yellow\", \"brown\"],
+	\"brown\": [\"yellow\", \"brown\"]
+}
+
+var offset = 2.1
+var size_x = 5
+var size_y = 5
+var superposition = [\"blue\", \"yellow\", \"brown\"]
+var wavefunction:Graph
+const SUPERPOSITION = \"superposition\"
+
+func _ready():
+	randomize()
+	wavefunction = Graph.new()
+	make_wave_function()
+	
+	
+	while true:
+		
+		# find a set of minimum sized Superpositions not collapsed
+		var min_size = 9e18
+		var collapse_candidates = null
+		for i in range(wavefunction.vertices.size()):
+			
+			var size = wavefunction.vertices[i].data[SUPERPOSITION].size()
+			if size < min_size and size > 1:
+				min_size = size
+				collapse_candidates = [i]
+			elif size == min_size:
+				collapse_candidates.append(i)
+		
+		if collapse_candidates == null:
+			break
+		
+		# select vertex to collapse
+		var collapsed_vertex = wavefunction.vertices[
+			collapse_candidates[randi()%collapse_candidates.size()]
+		]
+		
+		collapsed_vertex.data[SUPERPOSITION] = [
+			collapsed_vertex.data[SUPERPOSITION][
+				randi() % collapsed_vertex.data[SUPERPOSITION].size()
+			]
+		]
+		
+		# propagate the collapse
+		var collapse = Collapse.new(wavefunction, collapsed_vertex, ruleset)
+		collapse.collapse()
+		
+		
+	
+	
+	print_wavefunction()
+	
+	generate_map()
+	
+
+func generate_map():
+	
+	for v in wavefunction.vertices:
+		
+		var cube = make_cube(v.data[SUPERPOSITION][0], v.data['position'])
+		
+		$map.add_child(cube)
+		
+		
+		
+		
+
+
+func make_wave_function():
+
+	var vertices = []
+	
+	# make vertices
+	for i in range(size_x):
+		var vertices_row = []
+		for j in range(size_y):
+			
+			var vertex = make_vertex(superposition.duplicate(), Vector3(i * offset, 0, j * offset))
+			vertices_row.append(vertex)
+			wavefunction.add_vertex(vertex)
+			
+		vertices.append(vertices_row)
+	
+	# connect vertices horizontal
+	for i in range(0,size_x):
+		for j in range(0,size_y-1):
+			
+			wavefunction.add_edge(
+				vertices[i][j], 
+				vertices[i][j+1]
+			)
+	
+	# connect vertices vertical
+	for i in range(0,size_x):
+		for j in range(0,size_y-1):
+			
+			wavefunction.add_edge(
+				vertices[j][i],
+				vertices[j+1][i]
+			)
+	
+
+
+func make_vertex(superposition_:Array, position:Vector3):
+	
+	var V = Vertex.new({
+		\"superposition\":superposition_,
+		\"position\":position
+	})
+	
+	return V
+
+func make_cube(color:String, position:Vector3):
+	var cube : CSGBox = null
+	
+	match(color):
+		\"blue\": cube = $set/blue.duplicate(8) # 8 means use instancing
+		\"yellow\": cube = $set/yellow.duplicate(8)
+		\"brown\": cube = $set/brown.duplicate(8)
+	
+	var trans  = Transform(Basis(), position)
+	cube.transform = trans
+	
+	return cube
+
+
+func print_wavefunction():
+	
+	for i in range(size_x):
+		var print_str = ''
+		for j in range(size_y):
+			print_str += str(wavefunction.vertices[i * size_x + j].data[SUPERPOSITION])
+		print(print_str)
+"
+
+[sub_resource type="SpatialMaterial" id=1]
+albedo_color = Color( 0, 0.372549, 0.513726, 1 )
+
+[sub_resource type="SpatialMaterial" id=2]
+albedo_color = Color( 1, 0.843137, 0, 1 )
+
+[sub_resource type="SpatialMaterial" id=3]
+albedo_color = Color( 0.505882, 0.313726, 0.0666667, 1 )
+
+[node name="wfc" type="Spatial"]
+script = SubResource( 4 )
+
+[node name="set" type="Spatial" parent="."]
+visible = false
+
+[node name="blue" type="CSGBox" parent="set"]
+material = SubResource( 1 )
+
+[node name="yellow" type="CSGBox" parent="set"]
+material = SubResource( 2 )
+
+[node name="brown" type="CSGBox" parent="set"]
+material = SubResource( 3 )
+
+[node name="map" type="Spatial" parent="."]
+
+[node name="Camera" type="Camera" parent="."]
+transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 23.2853, 0 )
+current = true

@@ -8,10 +8,49 @@
 
 config_version=4
 
+_global_script_classes=[ {
+"base": "Object",
+"class": "BFS_itr",
+"language": "GDScript",
+"path": "res://addons/godot_utility/datastructure/graph/bfs_itr.gd"
+}, {
+"base": "Object",
+"class": "Collapse",
+"language": "GDScript",
+"path": "res://testscene/collapse.gd"
+}, {
+"base": "Object",
+"class": "DFS_itr",
+"language": "GDScript",
+"path": "res://addons/godot_utility/datastructure/graph/dfs_itr.gd"
+}, {
+"base": "Object",
+"class": "Graph",
+"language": "GDScript",
+"path": "res://addons/godot_utility/datastructure/graph/graph.gd"
+}, {
+"base": "Object",
+"class": "Vertex",
+"language": "GDScript",
+"path": "res://addons/godot_utility/datastructure/graph/vertex.gd"
+} ]
+_global_script_class_icons={
+"BFS_itr": "",
+"Collapse": "",
+"DFS_itr": "",
+"Graph": "",
+"Vertex": ""
+}
+
 [application]
 
 config/name="Wave Func Collapse"
+run/main_scene="res://testscene/wfc.tscn"
 config/icon="res://icon.png"
+
+[editor_plugins]
+
+enabled=PoolStringArray( "res://addons/godot_utility/datastructure/plugin.cfg" )
 
 [physics]
 
